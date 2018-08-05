@@ -1,4 +1,4 @@
-package automation.ryanm.bikeapp;
+package automation.ryanm.bikeapp.Controllers;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
