@@ -2,6 +2,7 @@ package automation.ryanm.bikeapp;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -11,14 +12,17 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.widget.TextView;
 
+import java.io.IOException;
 import java.util.Set;
+import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
 
     private TextView mTextMessage;
     private BluetoothDevice mainDevice = null;
     private int REQUEST_ENABLE_BT = 1;
-
+    private String uuidString = "f2801eef-31c3-4eb7-a95f-e635ada1fab4";
+    private BluetoothAdapter bluetoothAdapter = null;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -57,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        bluetoothAdapter =  BluetoothAdapter.getDefaultAdapter();
         if(!bluetoothAdapter.isEnabled()) {
 
             Intent enableBluetoothIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
@@ -70,8 +74,9 @@ public class MainActivity extends AppCompatActivity {
 
             if(pairedDevices.size() > 0) {
                 for (BluetoothDevice device : pairedDevices) {
-                    if(device.getName() == "raspberrypi") {
-                        mainDevice = device;
+                    Log.d("bt",device.getName());
+                    if(device.getName().equals("raspberrypi")) {
+                        mainDevice = bluetoothAdapter.getRemoteDevice(device.getAddress());
                         break;
                     }
                 }
@@ -81,10 +86,23 @@ public class MainActivity extends AppCompatActivity {
             Log.e("BT","Cannot pass null adapter");
         }
 
-
-
         mTextMessage = (TextView) findViewById(R.id.message);
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+
+        BluetoothSocket socket = null;
+        try {
+            if(mainDevice != null) {
+                socket = mainDevice.createRfcommSocketToServiceRecord(UUID.fromString(uuidString));
+            }
+            if(socket != null) {
+                socket.connect();
+            }
+        }
+        catch(IOException e) {
+            Log.e("BT", "Error creating socket");
+        }
+
+
     }
 }
