@@ -23,6 +23,7 @@ public class MainActivity extends AppCompatActivity {
     private int REQUEST_ENABLE_BT = 1;
     private String uuidString = "f2801eef-31c3-4eb7-a95f-e635ada1fab4";
     private BluetoothAdapter bluetoothAdapter = null;
+    private boolean bluetoothEnabled = false;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -49,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
         if(requestCode == REQUEST_ENABLE_BT) {
             if(resultCode == RESULT_OK) {
                 Log.d("BT","Bluetooth granted");
+                bluetoothEnabled = true;
             }
             else {
                 Log.d("BT","Bluetooth denied");
@@ -62,47 +64,47 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         bluetoothAdapter =  BluetoothAdapter.getDefaultAdapter();
-        if(!bluetoothAdapter.isEnabled()) {
+        bluetoothEnabled = bluetoothAdapter.isEnabled();
+        if(!bluetoothEnabled) {
 
             Intent enableBluetoothIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(enableBluetoothIntent, REQUEST_ENABLE_BT);
         }
 
-        try {
-            BluetoothController controller = new BluetoothController(bluetoothAdapter);
-            Set<BluetoothDevice> pairedDevices = controller.getDevices();
 
-            if(pairedDevices.size() > 0) {
-                for (BluetoothDevice device : pairedDevices) {
-                    Log.d("bt",device.getName());
-                    if(device.getName().equals("raspberrypi")) {
-                        mainDevice = bluetoothAdapter.getRemoteDevice(device.getAddress());
-                        break;
+        if(bluetoothEnabled) {
+            try {
+                BluetoothController controller = new BluetoothController(bluetoothAdapter);
+                Set<BluetoothDevice> pairedDevices = controller.getDevices();
+
+                if (pairedDevices.size() > 0) {
+                    for (BluetoothDevice device : pairedDevices) {
+                        Log.d("bt", device.getName());
+                        if (device.getName().equals("raspberrypi")) {
+                            mainDevice = bluetoothAdapter.getRemoteDevice(device.getAddress());
+                            break;
+                        }
                     }
                 }
+                BluetoothSocket socket = null;
+                try {
+                    if(mainDevice != null) {
+                        socket = mainDevice.createRfcommSocketToServiceRecord(UUID.fromString(uuidString));
+                    }
+                    if(socket != null) {
+                        socket.connect();
+                    }
+                }
+                catch(IOException e) {
+                    Log.e("BT", "Error creating socket");
+                }
+
+            } catch (Exception e) {
+                Log.e("BT", "Cannot pass null adapter");
             }
         }
-        catch(Exception e) {
-            Log.e("BT","Cannot pass null adapter");
-        }
-
         mTextMessage = (TextView) findViewById(R.id.message);
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
-
-        BluetoothSocket socket = null;
-        try {
-            if(mainDevice != null) {
-                socket = mainDevice.createRfcommSocketToServiceRecord(UUID.fromString(uuidString));
-            }
-            if(socket != null) {
-                socket.connect();
-            }
-        }
-        catch(IOException e) {
-            Log.e("BT", "Error creating socket");
-        }
-
-
     }
 }
