@@ -2,7 +2,6 @@ package automation.ryanm.bikeapp.Controllers;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.content.Intent;
 import android.util.Log;
 
 import java.util.Set;
