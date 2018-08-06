@@ -10,7 +10,7 @@ public class BluetoothController {
 
     private BluetoothAdapter bluetoothAdapter;
 
-    public BluetoothController(BluetoothAdapter adapter) throws Exception{
+    public BluetoothController(BluetoothAdapter adapter) throws Exception {
         if(adapter == null) {
             Log.e("BTController","Null adapter");
             throw new Exception();
