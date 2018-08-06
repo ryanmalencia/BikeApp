@@ -3,4 +3,5 @@
     <string name="title_home">Home</string>
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
+    <string name="failed_connection_message">Failed to connect! Retrying&#8230;</string>
 </resources>
