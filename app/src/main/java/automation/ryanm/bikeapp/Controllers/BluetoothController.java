@@ -7,6 +7,8 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Set;
 
 import automation.ryanm.bikeapp.IAsyncListener;
@@ -25,6 +27,31 @@ public class BluetoothController {
         }
         bluetoothAdapter = adapter;
     }
+
+    public void sendData(String data) {
+        try {
+            OutputStream os = bluetoothSocket.getOutputStream();
+            os.write(data.getBytes());
+        }
+        catch(IOException e) {
+            Log.e("BTController", "Failed to write data");
+        }
+    }
+
+    public InputStream getInputStream() {
+        try {
+            return bluetoothSocket.getInputStream();
+        }
+        catch(IOException e) {
+            return new InputStream() {
+                @Override
+                public int read() {
+                    return 0;
+                }
+            };
+        }
+    }
+
 
     public IAsyncListener setConnectListener(IAsyncListener listener) {
         asyncListener = listener;
@@ -85,7 +112,7 @@ public class BluetoothController {
 
         protected void onPostExecute(Integer result) {
             if(asyncListener != null) {
-                asyncListener.ActionComplete(result);
+                asyncListener.ActionComplete(result, "");
             }
         }
     }

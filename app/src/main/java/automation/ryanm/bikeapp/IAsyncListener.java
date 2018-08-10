@@ -1,5 +1,5 @@
 package automation.ryanm.bikeapp;
 
 public interface IAsyncListener {
-    void ActionComplete(int status);
+    void ActionComplete(int status, String message);
 }

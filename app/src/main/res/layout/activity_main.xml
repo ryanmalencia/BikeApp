@@ -12,31 +12,44 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
+        app:layout_constraintTop_toBottomOf="@id/bluetooth_error"
         android:indeterminate="true" />
 
     <TextView
         android:id="@+id/message"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="@dimen/activity_horizontal_margin"
-        android:layout_marginStart="@dimen/activity_horizontal_margin"
-        android:layout_marginTop="@dimen/activity_vertical_margin"
-        android:text="@string/title_home"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/bluetooth_error"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/startStop"
+        android:gravity="center"
+        android:textSize="40sp"
+        android:text="SPEED" />
 
     <TextView
         android:id="@+id/bluetooth_error"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         android:gravity="center"
         android:textSize="20sp"
         android:text="@string/failed_connection_message"
         android:background="@color/error"
         android:visibility="invisible"/>
+
+    <Button
+        android:id="@+id/startStop"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:text="START"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:enabled="false"
+        android:onClick="toggleRunning" />
 
     <android.support.design.widget.BottomNavigationView
         android:id="@+id/navigation"

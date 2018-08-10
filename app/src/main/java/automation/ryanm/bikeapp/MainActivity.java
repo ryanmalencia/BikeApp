@@ -11,10 +11,13 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.AnimationUtils;
+import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.text.DecimalFormat;
 import java.util.Set;
 import java.util.UUID;
 
@@ -22,32 +25,24 @@ import automation.ryanm.bikeapp.Controllers.BluetoothController;
 
 public class MainActivity extends AppCompatActivity implements IAsyncListener {
 
-    private TextView mTextMessage;
+    private TextView message;
     TextView errorMessage;
     private ProgressBar connectStatus;
+    private Button startStop;
     private int REQUEST_ENABLE_BT = 1;
     private int currentStatus = RESULT_OK;
     String uuidString = "f2801eef-31c3-4eb7-a95f-e635ada1fab4";
     BluetoothAdapter bluetoothAdapter = null;
     private boolean bluetoothEnabled = false;
     private BluetoothController controller;
+    private boolean running = false;
+    private final int MESSAGE_RECEIVED = 1055;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
 
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-            switch (item.getItemId()) {
-                case R.id.navigation_home:
-                    mTextMessage.setText(R.string.title_home);
-                    return true;
-                case R.id.navigation_dashboard:
-                    mTextMessage.setText(R.string.title_dashboard);
-                    return true;
-                case R.id.navigation_notifications:
-                    mTextMessage.setText(R.string.title_notifications);
-                    return true;
-            }
             return false;
         }
     };
@@ -108,7 +103,9 @@ public class MainActivity extends AppCompatActivity implements IAsyncListener {
         setContentView(R.layout.activity_main);
         errorMessage = findViewById(R.id.bluetooth_error);
         connectStatus = findViewById(R.id.connect_status);
-        bluetoothAdapter =  BluetoothAdapter.getDefaultAdapter();mTextMessage = findViewById(R.id.message);
+        startStop = findViewById(R.id.startStop);
+        message = findViewById(R.id.message);
+        bluetoothAdapter =  BluetoothAdapter.getDefaultAdapter();
         BottomNavigationView navigation = findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
         try {
@@ -145,14 +142,21 @@ public class MainActivity extends AppCompatActivity implements IAsyncListener {
             }
             if(controller.getSocket() != null) {
                 controller.Connect();
+
             }
         }
     }
 
-    public void ActionComplete(int status) {
-
+    public void ActionComplete(int status, String message) {
+        if(status == MESSAGE_RECEIVED) {
+            this.message.setText(message);
+            return;
+        }
         if(status == RESULT_OK) {
             connectStatus.setVisibility(View.GONE);
+            startStop.setEnabled(true);
+            ConnectedThread thread = new ConnectedThread(controller, this);
+            thread.start();
         }
 
         if(status != RESULT_OK && currentStatus != RESULT_CANCELED) {
@@ -172,5 +176,49 @@ public class MainActivity extends AppCompatActivity implements IAsyncListener {
             return;
         }
         currentStatus = status;
+    }
+
+    public void toggleRunning(View view) {
+        if(!running) {
+            controller.sendData("1");
+            startStop.setText("STOP");
+        }
+        else {
+            controller.sendData("0");
+            startStop.setText("START");
+        }
+        running = !running;
+    }
+
+    private class ConnectedThread extends Thread {
+        private final BluetoothController controller;
+        private byte[] buffer;
+        private IAsyncListener asyncListener = null;
+
+        public ConnectedThread(BluetoothController controller, IAsyncListener listener) {
+            this.controller = controller;
+            this.asyncListener = listener;
+        }
+
+        public void run() {
+            buffer = new byte[1024];
+            int numBytes = 0;
+            InputStream is = null;
+            is = controller.getInputStream();
+            while(true) {
+                try {
+                    numBytes = is.read(buffer);
+                    String message = new String(buffer);
+                    double value = Double.parseDouble(message);
+                    value = 81.68141/value * 0.05682;
+                    DecimalFormat df = new DecimalFormat("##.##");
+                    Log.e("TEST",message);
+                    asyncListener.ActionComplete(MESSAGE_RECEIVED, df.format(value) + " MPH");
+                }
+                catch(IOException e) {
+
+                }
+            }
+        }
     }
 }
