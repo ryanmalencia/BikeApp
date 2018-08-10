@@ -25,7 +25,8 @@ import automation.ryanm.bikeapp.Controllers.BluetoothController;
 
 public class MainActivity extends AppCompatActivity implements IAsyncListener {
 
-    private TextView message;
+    private TextView speed;
+    private TextView distance;
     TextView errorMessage;
     private ProgressBar connectStatus;
     private Button startStop;
@@ -37,6 +38,7 @@ public class MainActivity extends AppCompatActivity implements IAsyncListener {
     private BluetoothController controller;
     private boolean running = false;
     private final int MESSAGE_RECEIVED = 1055;
+    private int count = 0;
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -104,7 +106,8 @@ public class MainActivity extends AppCompatActivity implements IAsyncListener {
         errorMessage = findViewById(R.id.bluetooth_error);
         connectStatus = findViewById(R.id.connect_status);
         startStop = findViewById(R.id.startStop);
-        message = findViewById(R.id.message);
+        speed = findViewById(R.id.speed);
+        distance = findViewById(R.id.distance);
         bluetoothAdapter =  BluetoothAdapter.getDefaultAdapter();
         BottomNavigationView navigation = findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
@@ -149,7 +152,12 @@ public class MainActivity extends AppCompatActivity implements IAsyncListener {
 
     public void ActionComplete(int status, String message) {
         if(status == MESSAGE_RECEIVED) {
-            this.message.setText(message);
+            this.speed.setText(message);
+            count++;
+            double mileage = count * 81.68141/12/5280;
+            DecimalFormat df = new DecimalFormat("##.####");
+            String milestring = df.format(mileage) + " MILES";
+            this.distance.setText(milestring);
             return;
         }
         if(status == RESULT_OK) {

@@ -16,16 +16,27 @@
         android:indeterminate="true" />
 
     <TextView
-        android:id="@+id/message"
+        android:id="@+id/speed"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/bluetooth_error"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        android:gravity="center"
+        android:textSize="90sp"
+        android:text="SPEED" />
+
+    <TextView
+        android:id="@+id/distance"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/speed"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toTopOf="@id/startStop"
         android:gravity="center"
-        android:textSize="40sp"
-        android:text="SPEED" />
+        android:textSize="90sp"
+        android:text="DISTANCE" />
 
     <TextView
         android:id="@+id/bluetooth_error"
