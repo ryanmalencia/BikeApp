@@ -154,7 +154,7 @@ public class MainActivity extends AppCompatActivity implements IAsyncListener {
         if(status == MESSAGE_RECEIVED) {
             this.speed.setText(message);
             count++;
-            double mileage = count * 81.68141/12/5280;
+            double mileage = count * 73.513269/12/5280;
             DecimalFormat df = new DecimalFormat("##.####");
             String milestring = df.format(mileage) + " MILES";
             this.distance.setText(milestring);
@@ -218,7 +218,7 @@ public class MainActivity extends AppCompatActivity implements IAsyncListener {
                     numBytes = is.read(buffer);
                     String message = new String(buffer);
                     double value = Double.parseDouble(message);
-                    value = 81.68141/value * 0.05682;
+                    value = 73.513269/value * 0.05682;
                     DecimalFormat df = new DecimalFormat("##.##");
                     Log.e("TEST",message);
                     asyncListener.ActionComplete(MESSAGE_RECEIVED, df.format(value) + " MPH");
